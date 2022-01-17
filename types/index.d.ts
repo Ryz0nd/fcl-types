@@ -5,36 +5,6 @@ declare module "@onflow/types" {
       asInjection: any;
     }
   
-    enum FTypes {
-      Identity,
-      UInt,
-      UInt8,
-      UInt16,
-      UInt32,
-      UInt64,
-      UInt128,
-      UInt256,
-      Int,
-      Int8,
-      Int16,
-      Int32,
-      Int64,
-      Int128,
-      Int256,
-      Word8,
-      Word16,
-      Word3,
-      Word64,
-      UFix64,
-      Fix64,
-      String,
-      Character,
-      Bool,
-      Address,
-      Void,
-      Path,
-    }
-  
     export let Identity: T,
       UInt: T,
       UInt8: T,
@@ -64,13 +34,13 @@ declare module "@onflow/types" {
       Path: T,
       Reference: T;
   
-    export function Optional(children: FTypes): T;
-    export function Array(children: FTypes | FTypes[]): T;
+    export function Optional(children: T): T;
+    export function Array(children: T | T[]): T;
     export function Dictionary(
-      children: { key: FTypes; value: FTypes } | { key: FTypes; value: FTypes }[]
+      children: { key: T; value: T } | { key: T; value: T }[]
     ): T;
-    export function Event(id: string, fields: { value: FTypes }[]): T;
-    export function Resource(id: string, fields: { value: FTypes }[]): T;
-    export function Struct(id: string, fields: { value: FTypes }[]): T;
+    export function Event(id: string, fields: { value: T }[]): T;
+    export function Resource(id: string, fields: { value: T }[]): T;
+    export function Struct(id: string, fields: { value: T }[]): T;
   }
   
