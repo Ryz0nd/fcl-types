@@ -36,7 +36,7 @@ declare module "@onflow/fcl" {
   
     interface ArgumentObject {
       value: any;
-      type: FType;
+      xform: FType;
     }
   
     type ArgumentFunction = (
@@ -55,7 +55,7 @@ declare module "@onflow/fcl" {
       /**
        * Default is `fcl.authz`
        */
-      proposer?: AuthorizationFunction | AuthorizationObject;
+      proposer?: AuthorizationObject;
       /**
        * Default is `fcl.authz`
        */
@@ -78,7 +78,7 @@ declare module "@onflow/fcl" {
       redir?: boolean;
     }
   
-    export function authenticate({ service, redir }: Authenticate):void;
+    export function authenticate({ service, redir }: Authenticate): void;
     /**
      * Logs out the current user and sets the values on the current user object to null.
      */
@@ -158,10 +158,6 @@ declare module "@onflow/fcl" {
       keys: KeyObject[];
     }
   
-    interface AuthorizationFunction {
-      account: AccountObject;
-    }
-  
     interface AuthorizationObject {
       addr: Address;
       /**
@@ -228,7 +224,7 @@ declare module "@onflow/fcl" {
     }
     export const currentUser: CurrentUser;
   
-    interface Authn {
+    export interface Authn {
       result: any;
     }
   
@@ -241,14 +237,219 @@ declare module "@onflow/fcl" {
     export const discovery: Discovery;
   
     /**
-     * 메시지가 사용자의 개인 키로 서명되었는지 확인하여 애플리케이션이 Flow 계정의 소유권을 암호화 방식으로 확인할 수 있도록 하는 방법입니다.
-     * 일반적으로 `currentUser().signUserMessage`의 응답과 함께 사용됩니다. 
-     * @param message 16진수 문자열
-     * @param compositeSignatures `currentUser().signUserMessage`의 Return 값
+     * A method allowing applications to cryptographically verify the ownership of a Flow account by verifying a message was signed by a user's private key/s.
+     * This is typically used with the response from `currentUser().signUserMessage`.
+     * @param message `A hexadecimal string`
+     * @param compositeSignatures `An Array of `CompositeSignatures`
      */
     export function verifyUserSignatures(
       message: string,
       compositeSignatures: CompositeSignature[]
     ): Promise<boolean>;
+  
+    interface ResponseObject {
+      tag: number | null;
+      transaction: {
+        script: string;
+        args: string[];
+        referenceBlockId: string;
+        gasLimit: number;
+      } | null;
+    }
+  
+    type Builder = Promise<any>;
+  
+    export function send(builders: Builder[]): Promise<ResponseObject>;
+    export function decode(response: ResponseObject): Promise<any>;
+    export function getAccount(address: Address): Promise<AccountObject>;
+  
+    interface CollectionGuaranteeObject {
+      collectionId: string;
+      signatures: any[];
+    }
+  
+    interface BlockObject {
+      id: string;
+      parentId: string;
+      height: number;
+      timestamp: Record<string, any>;
+      collectionGuarantees: CollectionGuaranteeObject[];
+      blockSeals: any[];
+      signatures: any[];
+    }
+  
+    export function getBlock(isSealed?: boolean): Promise<BlockObject>;
+    export function atBlockHeight(
+      blockHeight: number
+    ): Promise<any>;
+    export function atBlockId(blockId?: string): Promise<any>;
+  
+    type BlockHeaderObject = Pick<
+      BlockObject,
+      "id" | "parentId" | "height" | "timestamp"
+    >;
+    export function getBlockHeader(): Promise<BlockHeaderObject>;
+  
+    /**
+     * A event name in Flow must follow the format
+     * `A.{AccountAddress}.{ContractName}.{EventName}`
+     * `eg. A.ba1132bc08f82fe2.Debug.Log`
+     */
+    type EventName = string;
+  
+    interface EventObject {
+      /**
+       * 	ID of the block that contains the event.
+       */
+      blockId: string;
+      /**
+       * Height of the block that contains the event.
+       */
+      blockHeight: number;
+      /**
+       * The timestamp of when the block was sealed in a `DateString` format. `eg. '2021-06-25T13:42:04.227Z'`
+       */
+      blockTimestamp: string;
+      /**
+       * 	A string containing the event name.
+       */
+      type: EventName;
+      /**
+       * Can be used to query transaction information, eg. via a Flow block explorer.
+       */
+      transactionId: string;
+      /**
+       * Used to prevent replay attacks. Used to prevent replay attacks.
+       */
+      transactionIndex: number;
+      /**
+       * Used to prevent replay attacks.
+       */
+      eventIndex: number;
+      /**
+       * The data emitted from the event.
+       */
+      data: any;
+    }
+  
+    export function getEventsAtBlockHeightRange(
+      eventName: EventName,
+      fromBlockHeight: number,
+      toBlockHeight: number
+    ): Promise<EventObject[]>;
+  
+    export function getEventsAtBlockIds(
+      eventName: EventName,
+      blockIds: number
+    ): Promise<EventObject[]>;
+  
+    /**
+     * 0: `Unknown`
+     *
+     * 1: `Transaction Pending - Awaiting Finalization`
+     *
+     * 2: `	Transaction Finalized - Awaiting Execution`
+     *
+     * 3: `Transaction Executed - Awaiting Sealing`
+     *
+     * 4: `Transaction Sealed - Transaction Complete. At this point the transaction result has been committed to the blockchain.`
+     *
+     * 5: `Transaction Expired`
+     */
+    enum TransactionStatusCode {
+      "Unknown" = 0,
+      "Pending" = 1,
+      "Finalized" = 2,
+      "Executed" = 3,
+      "Sealed" = 4,
+      "Expired" = 5,
+    }
+    type GRPCStatus = any;
+  
+    interface TransactionStatus {
+      /**
+       * An array of events that were emitted during the transaction.
+       */
+      events: EventObject[];
+      /**
+       * The status of the transaction on the blockchain.
+       */
+      status: TransactionStatusCode;
+      /**
+       * The `status` as as descriptive text (e.g. "FINALIZED").
+       */
+      statusString: TransactionStatusCode;
+      /**
+       * An error message if it exists. Default is an empty string `''`.
+       */
+      errorMessage: string;
+      /**
+       * 	The status from the GRPC response.
+       */
+      statusCode: GRPCStatus;
+    }
+  
+    /**
+     *
+     * @param transactionId The transactionID returned when submitting a transaction. Example: `9dda5f281897389b99f103a1c6b180eec9dac870de846449a302103ce38453f3`
+     */
+    export function getTransactionStatus(
+      transactionId: string
+    ): Promise<TransactionStatus>;
+  
+    type Transaction = Omit<TransactionStatus, "statusString">;
+  
+    export function getTransaction(transactionId: string): Promise<Transaction>;
+  
+    export function arg(value: any, type: FType): Promise<ArgumentObject>;
+  
+    export function args(args: Promise<ArgumentObject[]>): Promise<any>;
+  
+    export function script(code: string): Promise<any>;
+  
+    export function transaction(code: string): Promise<any>;
+  
+    export function account(address: Address): Promise<AccountObject>;
+  
+    export function latestBlock(isSealed: boolean): Promise<BlockObject>;
+  
+    export interface TxSubscribe {
+      status: TransactionStatusCode;
+      statusCode: number;
+      errorMessage: string;
+      events: {
+        data: {
+          amount: string;
+          from: string;
+        };
+        eventIndex: number;
+        transactionId: string;
+        transactionIndex: number;
+        type: string;
+      }[];
+    }
+  
+    interface Tx {
+      snapshot: () => void;
+      subscribe: (callback: (response: TxSubscribe) => void) => void;
+      onceFinalized: () => Promise<Extract<TransactionStatusCode, "Unknown">>;
+      onceExecuted: () => Promise<Extract<TransactionStatusCode, "Executed">>;
+      onceSealed: () => Promise<Extract<TransactionStatusCode, "Sealed">>;
+    }
+  
+    export function tx(transactionId: string): Tx;
+  
+    interface Events {
+      subscribe: (callback: any) => void;
+    }
+  
+    export function events(eventName: string): Events;
+  
+    interface ConfigMethod {
+      get: (key: string, value: any) => Promise<any>;
+      put: (key: string, value: any) => Omit<this, "get">;
+    }
+  
+    export function config(value?: { [key: string]: any }): ConfigMethod;
   }
   
