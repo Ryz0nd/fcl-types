@@ -78,23 +78,23 @@ declare module "@onflow/fcl" {
       redir?: boolean;
     }
   
-    export function authenticate({ service, redir }: Authenticate);
+    export function authenticate({ service, redir }: Authenticate):void;
     /**
      * Logs out the current user and sets the values on the current user object to null.
      */
-    export function unauthenticate();
+    export function unauthenticate(): void;
     /**
      * A convenience method that calls fcl.unauthenticate() and then fcl.authenticate() for the current user.
      */
-    export function reauthenticate(opts?: Record<string, any>);
+    export function reauthenticate(opts?: Record<string, any>): void;
     /**
      * A convenience method that calls and is equivalent to fcl.authenticate().
      */
-    export function signUp(opts?: Record<string, any>);
+    export function signUp(opts?: Record<string, any>): void;
     /**
      * A convenience method that calls and is equivalent to `fcl.authenticate()`.
      */
-    export function logIn(opts?: Record<string, any>);
+    export function logIn(opts?: Record<string, any>): void;
   
     /**
      * A valid Flow address should be 16 characters in length.
