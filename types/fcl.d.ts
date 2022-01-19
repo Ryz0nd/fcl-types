@@ -489,7 +489,7 @@ declare module "@onflow/fcl" {
       script: string;
       args: string[];
       referenceBlockId: string;
-      gasLimit: number; //check later
+      gasLimit: number;
       proposalKey: ResponseKey;
       payer: string;
       proposer: string;
@@ -518,7 +518,7 @@ declare module "@onflow/fcl" {
       parentId: string;
       height: number;
       timestamp: string;
-      collectionGuarantees: CollectionGuaranteeObject[]; // check later
+      collectionGuarantees: CollectionGuaranteeObject[];
       blockSeals: {
         blockId: string;
         executionReceiptId: string;
