@@ -110,8 +110,11 @@ declare module "@onflow/fcl" {
   export function atBlockId(blockId?: string): Promise<any>;
   /**
    * A builder function that returns the interaction to get a block header.
+   * @param isSealed If the latest block should be sealed or not.
    */
-  export function getBlockHeader(): Promise<BlockHeaderObject>;
+  export function getBlockHeader(
+    isSealed?: boolean
+  ): Promise<BlockHeaderObject>;
   /**
    * A builder function that returns all instances of a particular event (by name) within a height range.
    */
@@ -127,7 +130,7 @@ declare module "@onflow/fcl" {
    */
   export function getEventsAtBlockIds(
     eventName: EventName,
-    blockIds: number
+    blockIds?: number[]
   ): Promise<EventObject[]>;
   /**
    * A builder function that returns all a collection containing a list of transaction ids by its collection id.
@@ -154,6 +157,22 @@ declare module "@onflow/fcl" {
    * Example: `9dda5f281897389b99f103a1c6b180eec9dac870de846449a302103ce38453f3`
    */
   export function getTransaction(transactionId: string): Promise<Transaction>;
+  /**
+   * A builder function
+   */
+  export function limit(computeLimit: number): Promise<any>;
+  /**
+   * A builder function
+   */
+  export function payer(authz: AuthorizationObject): Promise<any>;
+  /**
+   * A builder function
+   */
+  export function proposer(authz: AuthorizationObject): Promise<any>;
+  /**
+   * A builder function
+   */
+  export function authorizations(ax: AuthorizationObject[]): Promise<any>;
   /**
    * A utility builder to be used with `fcl.args[...]` to create FCL supported arguments for interactions.
    * @param value Any value that you are looking to pass to other builders.
@@ -412,7 +431,7 @@ declare module "@onflow/fcl" {
    *
    * 1: `Transaction Pending - Awaiting Finalization`
    *
-   * 2: `	Transaction Finalized - Awaiting Execution`
+   * 2: `Transaction Finalized - Awaiting Execution`
    *
    * 3: `Transaction Executed - Awaiting Sealing`
    *
@@ -563,6 +582,7 @@ declare module "@onflow/fcl" {
 
   /**
    * A event name in Flow must follow the format
+   *
    * `A.{AccountAddress}.{ContractName}.{EventName}`
    * `eg. A.ba1132bc08f82fe2.Debug.Log`
    */
@@ -646,4 +666,50 @@ declare module "@onflow/fcl" {
     get: (key: string, value: any) => Promise<any>;
     put: (key: string, value: any) => Omit<this, "get">;
   }
+}
+
+declare module "@onflow/types" {
+  interface FType {
+    label: any;
+    asArgument: any;
+    asInjection: any;
+  }
+
+  export let Identity: FType,
+    UInt: FType,
+    UInt8: FType,
+    UInt16: FType,
+    UInt32: FType,
+    UInt64: FType,
+    UInt128: FType,
+    UInt256: FType,
+    Int: FType,
+    Int8: FType,
+    Int16: FType,
+    Int32: FType,
+    Int64: FType,
+    Int128: FType,
+    Int256: FType,
+    Word8: FType,
+    Word16: FType,
+    Word3: FType,
+    Word64: FType,
+    UFix64: FType,
+    Fix64: FType,
+    String: FType,
+    Character: FType,
+    Bool: FType,
+    Address: FType,
+    Void: FType,
+    Path: FType,
+    Reference: FType;
+
+  export function Optional(children: FType): FType;
+  export function Array(children: FType | FType[]): FType;
+  export function Dictionary(
+    children: { key: FType; value: FType } | { key: FType; value: FType }[]
+  ): FType;
+  export function Event(id: string, fields: { value: FType }[]): FType;
+  export function Resource(id: string, fields: { value: FType }[]): FType;
+  export function Struct(id: string, fields: { value: FType }[]): FType;
 }
