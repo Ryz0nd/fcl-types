@@ -164,15 +164,15 @@ declare module "@onflow/fcl" {
   /**
    * A builder function
    */
-  export function payer(authz: AuthorizationObject): Promise<any>;
+  export function payer(authz: AuthorizationObject | AuthorizationFunction): Promise<any>;
   /**
    * A builder function
    */
-  export function proposer(authz: AuthorizationObject): Promise<any>;
+  export function proposer(authz: AuthorizationObject | AuthorizationFunction): Promise<any>;
   /**
    * A builder function
    */
-  export function authorizations(ax: AuthorizationObject[]): Promise<any>;
+  export function authorizations(ax: Array<AuthorizationObject | AuthorizationFunction>): Promise<any>;
   /**
    * A utility builder to be used with `fcl.args[...]` to create FCL supported arguments for interactions.
    * @param value Any value that you are looking to pass to other builders.
@@ -183,7 +183,7 @@ declare module "@onflow/fcl" {
    * A utility builder to be used with other builders to pass in arguments with a value and supported type.
    * @param args An array of arguments that you are looking to pass to other builders.
    */
-  export function args(args: Promise<ArgumentObject[]>): Promise<any>;
+  export function args(args: Promise<ArgumentObject>[]): Promise<any>;
   /**
    * A template builder to use a Cadence script for an interaction.
    * @param code Should be valid Cadence script.
@@ -334,24 +334,40 @@ declare module "@onflow/fcl" {
   }
 
   export interface AuthorizationObject {
+    kind: string | null;
+    tempId: string | null;
+    signature: string | null;
+    resolve: () => void | null;
+    role: {
+      proposer: boolean;
+      authorizer: boolean;
+      payer: boolean;
+      param: boolean;
+    };
     /**
      * The address of the authorizer
      */
-    addr: Address;
+    addr: Address | null;
     /**
      * A function that allows FCL to sign using the authorization details and produce a valid signature.
      */
-    signingFunction: () => void;
+    signingFunction: (
+      signable: Signable
+    ) => Promise<Pick<this, "addr" | "keyId" | "signature">> | null;
     /**
      * 	The index of the key to use during authorization. (Multiple keys on an account is possible).
      */
-    keyId: number;
+    keyId: number | null;
     /**
      * A number that is incremented per transaction using they keyId.
      */
-    sequenceNum: number;
+    sequenceNum: number | null;
   }
 
+  export type AuthorizationFunction = (
+    account: AccountObject
+  ) => Promise<AuthorizationObject>;
+  
   export interface CurrentUserObject {
     /**
      * The public address of the current user
@@ -432,19 +448,39 @@ declare module "@onflow/fcl" {
     };
   }
 
+  export interface Signable {
+    /**
+     * The encoded string which needs to be used to produce the signature.*/
+
+    message: string | null;
+    /**  The address of the Flow Account this signature is to be produced for.*/
+    addr: Address | null;
+    /** The keyId of the key which is to be used to produce the signature. */
+    keyId: number | null;
+    roles: {
+      /** A Boolean representing if this signature to be produced for a proposer. */
+      proposer: boolean;
+      /** A Boolean representing if this signature to be produced for a authorizer.*/
+      authorizer: boolean;
+      /** A Boolean representing if this signature to be produced for a payer.*/
+      payer: boolean;
+    };
+    /** The raw transactions information, can be used to create the message for additional safety and lack of trust in the supplied message.*/
+    voucher: any;
+  }
   interface MutateArgs extends QueryArgs {
     /**
      * Default is `fcl.authz`
      */
-    proposer?: AuthorizationObject;
+    proposer?: AuthorizationObject | AuthorizationFunction;
     /**
      * Default is `fcl.authz`
      */
-    payer?: AuthorizationObject;
+    payer?: AuthorizationObject | AuthorizationFunction;
     /**
      * Default is `[fcl.authz]`
      */
-    authorizations?: AuthorizationObject[];
+    authorizations?: Array<AuthorizationObject| AuthorizationFunction>;
   }
 
   type TransactionStatusCode =
