@@ -341,7 +341,7 @@ declare module "@onflow/fcl" {
     /**
      * A function that allows FCL to sign using the authorization details and produce a valid signature.
      */
-    siginingFunction: () => void;
+    signingFunction: () => void;
     /**
      * 	The index of the key to use during authorization. (Multiple keys on an account is possible).
      */
