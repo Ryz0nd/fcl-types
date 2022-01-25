@@ -223,6 +223,9 @@ declare module "@onflow/fcl" {
 
   export function config(value?: { [key: string]: any }): ConfigMethod;
 
+  export function withPrefix(address?: string): string;
+  export function sansPrefix(address?: string): string;
+
   interface FType {
     label: any;
     asArgument: any;
