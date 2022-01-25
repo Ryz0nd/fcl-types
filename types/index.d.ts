@@ -30,7 +30,7 @@ declare module "@onflow/fcl" {
    *
    * It defines a signing function that connects to a user's wallet provider to produce signatures to submit transactions.
    */
-  export const authz: AuthorizationObject;
+  export const authz: (...args: any) => any;
   /**
    * Holds the current user, if set, and offers a set of functions to manage the authentication and authorization of the user.
    */
@@ -81,8 +81,9 @@ declare module "@onflow/fcl" {
    *
    * The builders required to be included in the array depend on the interaction that is being built.
    * @param builders
+   * @param opts `Object`
    */
-  export function send(builders: Builder[]): Promise<ResponseObject>;
+  export function send(builders: Builder[], opts: any): Promise<ResponseObject>;
   /**
    * Decodes the response from `fcl.send()` into the appropriate JSON representation of any values returned from Cadence code.
    * @param response Should be the response returned from `fcl.send([...])`
@@ -92,7 +93,7 @@ declare module "@onflow/fcl" {
    * A builder function that returns the interaction to get an account by address.
    * @param address Address of the user account with or without a prefix (both formats are supported).
    */
-  export function getAccount(address: Address): Promise<AccountObject>;
+  export function getAccount(address: Address): Promise<(...args: any) => any>;
   /**
    * A builder function that returns the interaction to get the latest block.
    * @param isSealed If the latest block should be sealed or not.
