@@ -164,15 +164,21 @@ declare module "@onflow/fcl" {
   /**
    * A builder function
    */
-  export function payer(authz: AuthorizationObject | AuthorizationFunction): Promise<any>;
+  export function payer(
+    authz: AuthorizationObject | AuthorizationFunction
+  ): Promise<any>;
   /**
    * A builder function
    */
-  export function proposer(authz: AuthorizationObject | AuthorizationFunction): Promise<any>;
+  export function proposer(
+    authz: AuthorizationObject | AuthorizationFunction
+  ): Promise<any>;
   /**
    * A builder function
    */
-  export function authorizations(ax: Array<AuthorizationObject | AuthorizationFunction>): Promise<any>;
+  export function authorizations(
+    ax: Array<AuthorizationObject | AuthorizationFunction>
+  ): Promise<any>;
   /**
    * A utility builder to be used with `fcl.args[...]` to create FCL supported arguments for interactions.
    * @param value Any value that you are looking to pass to other builders.
@@ -367,7 +373,7 @@ declare module "@onflow/fcl" {
   export type AuthorizationFunction = (
     account: AccountObject
   ) => Promise<AuthorizationObject>;
-  
+
   export interface CurrentUserObject {
     /**
      * The public address of the current user
@@ -480,7 +486,7 @@ declare module "@onflow/fcl" {
     /**
      * Default is `[fcl.authz]`
      */
-    authorizations?: Array<AuthorizationObject| AuthorizationFunction>;
+    authorizations?: Array<AuthorizationObject | AuthorizationFunction>;
   }
 
   type TransactionStatusCode =
