@@ -343,17 +343,29 @@ declare module "@onflow/fcl" {
     keys: KeyObject[];
   }
 
+  export interface AuthorizationAccountObject {
+    kind: string;
+    tempId: string;
+    addr: string | null;
+    keyId: number | null;
+    sequenceNum: number | null;
+    signature: string | null;
+    /**
+     * A function that allows FCL to sign using the authorization details and produce a valid signature.
+     */
+    signingFunction: (
+      signable: Signable
+    ) => Promise<Pick<this, "addr" | "keyId" | "signature">> | null;
+    resolve: () => void | null;
+    role: Role;
+  }
+
   export interface AuthorizationObject {
     kind: string | null;
     tempId: string | null;
     signature: string | null;
     resolve: () => void | null;
-    role: {
-      proposer: boolean;
-      authorizer: boolean;
-      payer: boolean;
-      param: boolean;
-    };
+    role: Role;
     /**
      * The address of the authorizer
      */
@@ -374,9 +386,16 @@ declare module "@onflow/fcl" {
     sequenceNum: number | null;
   }
 
+  export type Role = {
+    proposer: boolean;
+    authorizer: boolean;
+    payer: boolean;
+    param: boolean;
+  };
+
   export type AuthorizationFunction = (
-    account: AccountObject
-  ) => Promise<AuthorizationObject>;
+    account: AuthorizationAccountObject
+  ) => AuthorizationObject;
 
   export interface CurrentUserObject {
     /**
@@ -462,7 +481,7 @@ declare module "@onflow/fcl" {
     /**
      * The encoded string which needs to be used to produce the signature.*/
 
-    message: string | null;
+    message: string;
     /**  The address of the Flow Account this signature is to be produced for.*/
     addr: Address | null;
     /** The keyId of the key which is to be used to produce the signature. */
