@@ -355,7 +355,7 @@ declare module "@onflow/fcl" {
      */
     signingFunction: (
       signable: Signable
-    ) => Promise<Pick<this, "addr" | "keyId" | "signature">> | null;
+    ) => Pick<this, "addr" | "keyId" | "signature"> | null;
     resolve: () => void | null;
     role: Role;
   }
