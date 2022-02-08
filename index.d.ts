@@ -270,9 +270,9 @@ declare module "@onflow/fcl" {
   }
 
   type ArgumentFunction = (
-    arg: (value: any, type: FType) => void,
+    arg: (value: any, type: FType) => ArgumentObject,
     t: Record<FTypes, FType>
-  ) => void[];
+  ) => ArgumentObject[];
 
   interface QueryArgs {
     cadence: string;
