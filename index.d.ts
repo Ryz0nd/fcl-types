@@ -119,20 +119,20 @@ declare module "@onflow/fcl" {
   /**
    * A builder function that returns all instances of a particular event (by name) within a height range.
    */
-  export function getEventsAtBlockHeightRange(
+  export function getEventsAtBlockHeightRange<EventData>(
     eventName: EventName,
     fromBlockHeight: number,
     toBlockHeight: number
-  ): Promise<EventObject[]>;
+  ): Promise<EventObject<EventData>[]>;
   /**
    * A builder function that returns all instances of a particular event (by name) within a set of blocks, specified by block ids.
    * @param eventName	The name of the event.
    * @param blockIds The ids of the blocks to scan for events.
    */
-  export function getEventsAtBlockIds(
+  export function getEventsAtBlockIds<EventData>(
     eventName: EventName,
     blockIds?: string[]
-  ): Promise<EventObject[]>;
+  ): Promise<EventObject<EventData>[]>;
   /**
    * A builder function that returns all a collection containing a list of transaction ids by its collection id.
    * @param collectionId The id of the collection.
@@ -147,9 +147,9 @@ declare module "@onflow/fcl" {
    *
    * Example: `9dda5f281897389b99f103a1c6b180eec9dac870de846449a302103ce38453f3`
    */
-  export function getTransactionStatus(
+  export function getTransactionStatus<EventData>(
     transactionId: string
-  ): Promise<TransactionStatus>;
+  ): Promise<TransactionStatus<EventData>>;
   /**
    * A builder function that returns a transaction object once decoded.
    * @param transactionId
@@ -157,7 +157,9 @@ declare module "@onflow/fcl" {
    *
    * Example: `9dda5f281897389b99f103a1c6b180eec9dac870de846449a302103ce38453f3`
    */
-  export function getTransaction(transactionId: string): Promise<Transaction>;
+  export function getTransaction<EventData>(
+    transactionId: string
+  ): Promise<Transaction<EventData>>;
   /**
    * A builder function
    */
@@ -215,7 +217,7 @@ declare module "@onflow/fcl" {
    * A utility function that lets you set the transaction to get subsequent status updates (via polling) and the finalized result once available.
    * @param transactionId A valid transaction id.
    */
-  export function tx(transactionId: string): Tx;
+  export function tx<T>(transactionId: string): Tx<T>;
   /**
    * A utility function that lets you set the transaction to get subsequent status updates (via polling) and the finalized result once available.
    * @param eventName A valid event name.
@@ -663,11 +665,11 @@ declare module "@onflow/fcl" {
      */
     | 16;
 
-  export interface TransactionStatus {
+  export interface TransactionStatus<EventData> {
     /**
      * An array of events that were emitted during the transaction.
      */
-    events: EventObject[];
+    events: EventObject<EventData>[];
     /**
      * The status of the transaction on the blockchain.
      */
@@ -686,7 +688,7 @@ declare module "@onflow/fcl" {
     statusCode: GRPCStatus;
   }
 
-  export type Transaction = Omit<TransactionStatus, "statusString">;
+  export type Transaction<T> = Omit<TransactionStatus<T>, "statusString">;
 
   interface Authenticate {
     service?: any;
@@ -801,7 +803,7 @@ declare module "@onflow/fcl" {
    */
   type EventName = string;
 
-  export interface EventObject {
+  export interface EventObject<Data> {
     /**
      * 	ID of the block that contains the event.
      */
@@ -833,23 +835,17 @@ declare module "@onflow/fcl" {
     /**
      * The data emitted from the event.
      */
-    data: any;
+    data: Data;
   }
 
-  export interface TxSubscribe {
+  export interface TxSubscribe<EventData> {
     status: TransactionStatusCode;
     statusCode: number;
     errorMessage: string;
-    events: {
-      data: {
-        amount: string;
-        from: string;
-      };
-      eventIndex: number;
-      transactionId: string;
-      transactionIndex: number;
-      type: string;
-    }[];
+    events: Pick<
+      EventObject<EventData>,
+      "data" | "eventIndex" | "transactionId" | "transactionIndex" | "type"
+    >[];
   }
 
   export interface CollectionObject {
@@ -863,12 +859,12 @@ declare module "@onflow/fcl" {
     transactionIds: string[];
   }
 
-  interface Tx {
+  interface Tx<EventData> {
     snapshot: () => void;
-    subscribe: (callback: (response: TxSubscribe) => void) => void;
-    onceFinalized: () => Promise<Transaction>;
-    onceExecuted: () => Promise<Transaction>;
-    onceSealed: () => Promise<Transaction>;
+    subscribe: (callback: (response: TxSubscribe<EventData>) => void) => void;
+    onceFinalized: () => Promise<Transaction<EventData>>;
+    onceExecuted: () => Promise<Transaction<EventData>>;
+    onceSealed: () => Promise<Transaction<EventData>>;
   }
 
   interface Events {
