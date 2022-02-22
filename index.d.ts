@@ -514,42 +514,45 @@ declare module "@onflow/fcl" {
     authorizations?: Array<AuthorizationObject | AuthorizationFunction>;
   }
 
-  type TransactionStatusCode =
+  export enum TransactionStatusCode {
     /**
      * Unknown
      */
-    | 0
+    Unknown = 0,
     /**
      * Transaction Pending - Awaiting Finalization
      */
-    | 1
+    Pending,
     /**
      * Transaction Finalized - Awaiting Execution
      */
-    | 2
+    Finalized,
     /**
      * Transaction Executed - Awaiting Sealing
      */
-    | 3
+    Executed,
     /**
      * Transaction Sealed - Transaction Complete. At this point the transaction
      * result has been committed to the blockchain.
      */
-    | 4
+    Sealed,
     /**
      * Transaction Expired
      */
-    | 5;
+    Expired,
+  }
 
-  type GRPCStatus =
+
+  export enum GRPCStatus {
+    
     /**
      * OK - Not an error; returned on success.
      */
-    | 0
+    OK = 0,
     /**
      * CANCELLED - 	The operation was cancelled, typically by the caller.
      */
-    | 1
+    CANCELLED,
     /**
      * UNKNOWN - Unknown error. For example, this error may be returned when a
      * Status value received from another address space belongs to an error
@@ -557,14 +560,14 @@ declare module "@onflow/fcl" {
      * that do  not return enough error information may be converted to this
      * error.
      */
-    | 2
+    UNKNOWN,
     /**
      * INVALID_ARGUMENT - The client specified an invalid argument. Note that
      * this differs from FAILED_PRECONDITION. INVALID_ARGUMENT indicates
      * arguments that are problematic regardless of the state of the system
      * (e.g., a malformed file name).
      */
-    | 3
+    INVALID_ARGUMENT,
     /**
      * DEADLINE_EXCEEDED - The deadline expired before the operation could
      * complete. For operations that change the state of the system, this error
@@ -572,7 +575,7 @@ declare module "@onflow/fcl" {
      * example, a successful response from a server could have been delayed
      * long.
      */
-    | 4
+    DEADLINE_EXCEEDED,
     /**
      * NOT_FOUND - Some requested entity (e.g., file or directory) was not
      * found. Note to server developers: if a request is denied for an entire
@@ -581,12 +584,12 @@ declare module "@onflow/fcl" {
      * within a class of users, such as user-based access control,
      * PERMISSION_DENIED must be used.
      */
-    | 5
+    NOT_FOUND,
     /**
      * ALREADY_EXISTS - The entity that a client attempted to create (e.g., file
      * or directory) already exists.
      */
-    | 6
+    ALREADY_EXISTS,
     /**
      * PERMISSION_DENIED - The caller does not have permission to execute the
      * specified operation. PERMISSION_DENIED must not be used for rejections
@@ -596,12 +599,12 @@ declare module "@onflow/fcl" {
      * code does not imply the request is valid or the requested entity exists
      * or satisfies other pre-conditions.
      */
-    | 7
+    PERMISSION_DENIED,
     /**
      * RESOURCE_EXHAUSTED - Some resource has been exhausted, perhaps a per-user
      * quota, or perhaps the entire file system is out of space.
      */
-    | 8
+    RESOURCE_EXHAUSTED,
     /**
      * FAILED_PRECONDITION - The operation was rejected because the system is
      * not in a state required for the operation's execution. For example, the
@@ -617,14 +620,14 @@ declare module "@onflow/fcl" {
      * FAILED_PRECONDITION should be returned since the client should not retry
      * unless the files are deleted from the directory.
      */
-    | 9
+    FAILED_PRECONDITION,
     /**
      * ABORTED - The operation was aborted, typically due to a concurrency issue
      * such as a sequencer check failure or transaction abort. See the
      * guidelines above for deciding between FAILED_PRECONDITION, ABORTED, and
      * UNAVAILABLE.
      */
-    | 10
+    ABORTED,
     /**
      * OUT_OF_RANGE - The operation was attempted past the valid range. E.g.,
      * seeking or reading past end-of-file. Unlike INVALID_ARGUMENT, this error
@@ -637,35 +640,37 @@ declare module "@onflow/fcl" {
      * when it applies so that callers who are iterating through a space can
      * easily look for an OUT_OF_RANGE error to detect when they are done.
      */
-    | 11
+    OUT_OF_RANGE,
     /**
      * UNIMPLEMENTED - The operation is not implemented or is not
      * supported/enabled in this service.
      */
-    | 12
+    UNIMPLEMENTED,
     /**
      * INTERNAL - Internal errors. This means that some invariants expected by
      * the underlying system have been broken. This error code is reserved for
      * serious errors.
      */
-    | 13
+    INTERNAL,
     /**
      * UNAVAILABLE - The service is currently unavailable. This is most likely a
      * transient condition, which can be corrected by retrying with a backoff.
      * Note that it is not always safe to retry non-idempotent operations.
      */
-    | 14
+    UNAVAILABLE,
     /**
      * DATA_LOSS - Unrecoverable data loss or corruption.
      */
-    | 15
+    DATA_LOSS,
     /**
      * UNAUTHENTICATED - The request does not have valid authentication
      * credentials for the operation.
      */
-    | 16;
-
-  export interface TransactionStatus<EventData> {
+    UNAUTHENTICATED,
+  }
+    
+    
+    export interface TransactionStatus<EventData> {
     /**
      * An array of events that were emitted during the transaction.
      */
