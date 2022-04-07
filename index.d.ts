@@ -83,7 +83,16 @@ declare module "@onflow/fcl" {
    * @param builders
    * @param opts `Object`
    */
-  export function send(builders: Builder[], opts: any): Promise<ResponseObject>;
+  export function send(
+    builders: Builder[],
+    opts?: {
+      send?: any;
+      resolve?: any;
+      node?: any;
+
+      [key: string]: any;
+    }
+  ): Promise<ResponseObject>;
   /**
    * Decodes the response from `fcl.send()` into the appropriate JSON representation of any values returned from Cadence code.
    * @param response Should be the response returned from `fcl.send([...])`
