@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@types/onflow__fcl",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "The repository for type definition of fcl-js library.",
   "scripts": {},
   "repository": {
