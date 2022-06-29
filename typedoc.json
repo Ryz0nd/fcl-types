@@ -1,0 +1,10 @@
+{
+  "name": "FCL Types",
+  "entryPoints": ["index.d.ts"],
+  "out": "pages/docs",
+  "categorizeByGroup": true,
+  "includeVersion": true,
+  "githubPages": false,
+  "publicPath": "/docs/",
+  "entryDocument": "../index.md"
+}
